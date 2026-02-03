@@ -95,6 +95,7 @@ io.on('connection', (socket) => {
         cardHolder: updatedGame.cardHolder,
         describingPlayers: updatedGame.describingPlayers,
         card: updatedGame.currentCard,
+        currentCard: updatedGame.currentCard, // Also send as currentCard for consistency
         guessedPhrases: updatedGame.guessedPhrases,
         scores: updatedGame.scores,
         timerStarted: true
@@ -219,6 +220,7 @@ io.on('connection', (socket) => {
         cardHolder: updatedGame.cardHolder,
         describingPlayers: updatedGame.describingPlayers,
         card: updatedGame.currentCard,
+        currentCard: updatedGame.currentCard, // Also send as currentCard for consistency
         guessedPhrases: updatedGame.guessedPhrases,
         scores: updatedGame.scores,
         timerStarted: true

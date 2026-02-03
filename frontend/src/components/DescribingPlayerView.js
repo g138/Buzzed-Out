@@ -27,9 +27,10 @@ const DescribingPlayerView = ({ card, guessedPhrases, gameCode, socket, cardPass
     socket.emit('markCorrect', { gameCode, phraseIndex });
   };
 
-  if (!card) {
+  if (!card || !card.phrases) {
     return (
       <div className="bg-white rounded-lg p-8 text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
         <p className="text-gray-600">Loading card...</p>
       </div>
     );

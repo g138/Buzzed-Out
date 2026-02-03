@@ -51,7 +51,11 @@ const AppContent = () => {
 
     // Listen for game started
     socket.on('gameStarted', (state) => {
-      setGameState(state);
+      // Ensure card is mapped to currentCard for consistency
+      setGameState({
+        ...state,
+        currentCard: state.card || state.currentCard
+      });
       setCurrentView('game');
       setError(null);
     });
@@ -60,7 +64,8 @@ const AppContent = () => {
     socket.on('roundStarted', (state) => {
       setGameState(prev => ({
         ...prev,
-        ...state
+        ...state,
+        currentCard: state.card || state.currentCard // Ensure card is mapped correctly
       }));
     });
 

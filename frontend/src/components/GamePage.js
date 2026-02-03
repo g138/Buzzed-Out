@@ -158,6 +158,8 @@ const GamePage = ({ gameCode, player, gameState, socket, onNextRound }) => {
             socket={socket}
             player={player}
             cardHolder={localGameState.cardHolder}
+            card={localGameState.currentCard}
+            guessedPhrases={guessedPhrases}
           />
         )}
 
