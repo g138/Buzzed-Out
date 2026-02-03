@@ -1,10 +1,11 @@
 const { v4: uuidv4 } = require('uuid');
 
-// Dummy card data - in production, this would come from a database
+// Dummy card data - Each card has TWO SIDES (blue and orange) with different words
+// Blue side = Team A, Orange side = Team B
 const CARDS = [
   {
     id: 1,
-    phrases: [
+    blueSide: [ // Team A side
       "The Great Wall of China",
       "Eiffel Tower",
       "Mount Everest",
@@ -15,11 +16,23 @@ const CARDS = [
       "Stonehenge",
       "Colosseum",
       "Big Ben"
+    ],
+    orangeSide: [ // Team B side
+      "Golden Gate Bridge",
+      "Sydney Opera House",
+      "Christ the Redeemer",
+      "Petra",
+      "Angkor Wat",
+      "Niagara Falls",
+      "Grand Canyon",
+      "Mount Fuji",
+      "Leaning Tower of Pisa",
+      "Buckingham Palace"
     ]
   },
   {
     id: 2,
-    phrases: [
+    blueSide: [
       "Harry Potter",
       "Star Wars",
       "The Lord of the Rings",
@@ -30,11 +43,23 @@ const CARDS = [
       "Stranger Things",
       "The Simpsons",
       "SpongeBob SquarePants"
+    ],
+    orangeSide: [
+      "The Matrix",
+      "Inception",
+      "The Avengers",
+      "The Walking Dead",
+      "Lost",
+      "House of Cards",
+      "Sherlock",
+      "Doctor Who",
+      "South Park",
+      "Family Guy"
     ]
   },
   {
     id: 3,
-    phrases: [
+    blueSide: [
       "Pizza",
       "Sushi",
       "Tacos",
@@ -45,11 +70,23 @@ const CARDS = [
       "French Fries",
       "Donuts",
       "Pancakes"
+    ],
+    orangeSide: [
+      "Salad",
+      "Soup",
+      "Sandwich",
+      "Steak",
+      "Chicken",
+      "Rice",
+      "Bread",
+      "Cheese",
+      "Apple",
+      "Banana"
     ]
   },
   {
     id: 4,
-    phrases: [
+    blueSide: [
       "Basketball",
       "Soccer",
       "Tennis",
@@ -60,11 +97,23 @@ const CARDS = [
       "Baseball",
       "Volleyball",
       "Skiing"
+    ],
+    orangeSide: [
+      "Football",
+      "Hockey",
+      "Cricket",
+      "Rugby",
+      "Boxing",
+      "Wrestling",
+      "Archery",
+      "Fencing",
+      "Surfing",
+      "Skateboarding"
     ]
   },
   {
     id: 5,
-    phrases: [
+    blueSide: [
       "Guitar",
       "Piano",
       "Drums",
@@ -75,11 +124,23 @@ const CARDS = [
       "Bass",
       "Cello",
       "Harmonica"
+    ],
+    orangeSide: [
+      "Ukulele",
+      "Banjo",
+      "Accordion",
+      "Harp",
+      "Trombone",
+      "Clarinet",
+      "Oboe",
+      "Tuba",
+      "Xylophone",
+      "Tambourine"
     ]
   },
   {
     id: 6,
-    phrases: [
+    blueSide: [
       "Superman",
       "Batman",
       "Spider-Man",
@@ -90,11 +151,23 @@ const CARDS = [
       "Hulk",
       "Black Widow",
       "Wolverine"
+    ],
+    orangeSide: [
+      "Flash",
+      "Green Lantern",
+      "Aquaman",
+      "Deadpool",
+      "Captain Marvel",
+      "Black Panther",
+      "Doctor Strange",
+      "Ant-Man",
+      "Hawkeye",
+      "Storm"
     ]
   },
   {
     id: 7,
-    phrases: [
+    blueSide: [
       "Apple",
       "Banana",
       "Orange",
@@ -105,11 +178,23 @@ const CARDS = [
       "Mango",
       "Kiwi",
       "Blueberry"
+    ],
+    orangeSide: [
+      "Cherry",
+      "Peach",
+      "Pear",
+      "Plum",
+      "Raspberry",
+      "Cantaloupe",
+      "Papaya",
+      "Coconut",
+      "Avocado",
+      "Pomegranate"
     ]
   },
   {
     id: 8,
-    phrases: [
+    blueSide: [
       "Dog",
       "Cat",
       "Elephant",
@@ -120,11 +205,23 @@ const CARDS = [
       "Eagle",
       "Shark",
       "Penguin"
+    ],
+    orangeSide: [
+      "Rabbit",
+      "Horse",
+      "Monkey",
+      "Giraffe",
+      "Zebra",
+      "Wolf",
+      "Whale",
+      "Owl",
+      "Octopus",
+      "Kangaroo"
     ]
   },
   {
     id: 9,
-    phrases: [
+    blueSide: [
       "Doctor",
       "Teacher",
       "Engineer",
@@ -135,11 +232,23 @@ const CARDS = [
       "Pilot",
       "Scientist",
       "Lawyer"
+    ],
+    orangeSide: [
+      "Nurse",
+      "Professor",
+      "Architect",
+      "Baker",
+      "Designer",
+      "Singer",
+      "Coach",
+      "Captain",
+      "Researcher",
+      "Judge"
     ]
   },
   {
     id: 10,
-    phrases: [
+    blueSide: [
       "Beach",
       "Mountain",
       "Forest",
@@ -150,6 +259,18 @@ const CARDS = [
       "Island",
       "Volcano",
       "Waterfall"
+    ],
+    orangeSide: [
+      "Valley",
+      "Canyon",
+      "Jungle",
+      "Tundra",
+      "Sea",
+      "Stream",
+      "Pond",
+      "Peninsula",
+      "Geyser",
+      "Cave"
     ]
   }
 ];
@@ -202,12 +323,11 @@ class GameManager {
         B: []
       },
       currentRound: 0,
-      cardHolder: null, // 'A' or 'B'
-      describingPlayers: [], // IDs of describing players
-      currentCard: null, // Card currently being played (for the team holding it)
-      teamACard: null, // Card for Team A
-      teamBCard: null, // Card for Team B
-      guessedPhrases: [], // Indices of guessed phrases
+      cardHolder: null, // 'A' or 'B' - team currently holding the card
+      describingPlayers: [], // IDs of describing players [teamA_desc, teamB_desc]
+      currentCard: null, // Single card with blueSide and orangeSide
+      guessedPhrasesBlue: [], // Indices of guessed phrases on blue side (Team A)
+      guessedPhrasesOrange: [], // Indices of guessed phrases on orange side (Team B)
       scores: {
         A: 0,
         B: 0
@@ -282,7 +402,8 @@ class GameManager {
   startRound(gameCode) {
     const game = this.games.get(gameCode);
     game.currentRound++;
-    game.guessedPhrases = [];
+    game.guessedPhrasesBlue = [];
+    game.guessedPhrasesOrange = [];
 
     // Randomly select starting team with card
     game.cardHolder = Math.random() < 0.5 ? 'A' : 'B';
@@ -296,30 +417,13 @@ class GameManager {
 
     game.describingPlayers = [descA.id, descB.id];
 
-    // Select different random cards for each team and shuffle the phrases
-    let cardAIndex = Math.floor(Math.random() * CARDS.length);
-    let cardBIndex = Math.floor(Math.random() * CARDS.length);
-    
-    // Ensure teams get different cards
-    while (cardBIndex === cardAIndex && CARDS.length > 1) {
-      cardBIndex = Math.floor(Math.random() * CARDS.length);
-    }
-
-    const cardA = CARDS[cardAIndex];
-    const cardB = CARDS[cardBIndex];
-
-    game.teamACard = {
-      id: cardA.id,
-      phrases: shuffleArray(cardA.phrases) // Shuffle phrases for randomness
+    // Select ONE random card with two sides (blue and orange)
+    const randomCard = CARDS[Math.floor(Math.random() * CARDS.length)];
+    game.currentCard = {
+      id: randomCard.id,
+      blueSide: shuffleArray(randomCard.blueSide), // Shuffle blue side phrases
+      orangeSide: shuffleArray(randomCard.orangeSide) // Shuffle orange side phrases
     };
-
-    game.teamBCard = {
-      id: cardB.id,
-      phrases: shuffleArray(cardB.phrases) // Shuffle phrases for randomness
-    };
-
-    // Set the current card based on which team starts with it
-    game.currentCard = game.cardHolder === 'A' ? game.teamACard : game.teamBCard;
   }
 
   /**
@@ -331,28 +435,34 @@ class GameManager {
       throw new Error('Game not found');
     }
 
-    if (game.guessedPhrases.includes(phraseIndex)) {
+    // Determine which side's phrases to check based on card holder
+    const isBlueSide = game.cardHolder === 'A';
+    const guessedPhrases = isBlueSide ? game.guessedPhrasesBlue : game.guessedPhrasesOrange;
+    const phrases = isBlueSide ? game.currentCard.blueSide : game.currentCard.orangeSide;
+
+    if (guessedPhrases.includes(phraseIndex)) {
       throw new Error('Phrase already guessed');
     }
 
-    game.guessedPhrases.push(phraseIndex);
+    // Add to appropriate side's guessed phrases
+    if (isBlueSide) {
+      game.guessedPhrasesBlue.push(phraseIndex);
+    } else {
+      game.guessedPhrasesOrange.push(phraseIndex);
+    }
 
-    // Pass card to other team
-    game.cardHolder = game.cardHolder === 'A' ? 'B' : 'A';
-    
-    // Switch to the other team's card
-    game.currentCard = game.cardHolder === 'A' ? game.teamACard : game.teamBCard;
-    
-    // Reset guessed phrases when card passes (new team, new card)
-    game.guessedPhrases = [];
-
-    // Check if all phrases guessed (using the current card)
-    const allGuessed = game.guessedPhrases.length === game.currentCard.phrases.length;
+    // Check if all phrases guessed on BOTH sides BEFORE passing card
+    const allBlueGuessed = game.guessedPhrasesBlue.length === game.currentCard.blueSide.length;
+    const allOrangeGuessed = game.guessedPhrasesOrange.length === game.currentCard.orangeSide.length;
+    const allGuessed = allBlueGuessed && allOrangeGuessed;
     
     if (allGuessed) {
-      // Both teams get a point
+      // Both teams get a point if all phrases guessed before buzzer
       game.scores.A++;
       game.scores.B++;
+    } else {
+      // Pass card to other team (only if not all guessed)
+      game.cardHolder = game.cardHolder === 'A' ? 'B' : 'A';
     }
 
     return { allGuessed };

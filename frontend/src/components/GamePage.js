@@ -26,7 +26,7 @@ const GamePage = ({ gameCode, player, gameState, socket, onNextRound }) => {
   useEffect(() => {
     if (!socket) return;
 
-    const handleCardPassed = ({ cardHolder, card, phraseIndex, scores, guessedPhrases: gp }) => {
+    const handleCardPassed = ({ cardHolder, card, phraseIndex, scores, guessedPhrasesBlue, guessedPhrasesOrange }) => {
       setCardPassAnimation(true);
       setTimeout(() => setCardPassAnimation(false), 500);
       setLocalGameState(prev => ({
@@ -34,19 +34,19 @@ const GamePage = ({ gameCode, player, gameState, socket, onNextRound }) => {
         cardHolder,
         currentCard: card,
         scores,
-        guessedPhrases: gp
+        guessedPhrasesBlue: guessedPhrasesBlue || [],
+        guessedPhrasesOrange: guessedPhrasesOrange || []
       }));
-      setGuessedPhrases(gp || []);
     };
 
-    const handleAllPhrasesGuessed = ({ card, scores, guessedPhrases: gp }) => {
+    const handleAllPhrasesGuessed = ({ card, scores, guessedPhrasesBlue, guessedPhrasesOrange }) => {
       setLocalGameState(prev => ({
         ...prev,
         currentCard: card,
         scores,
-        guessedPhrases: gp
+        guessedPhrasesBlue: guessedPhrasesBlue || [],
+        guessedPhrasesOrange: guessedPhrasesOrange || []
       }));
-      setGuessedPhrases(gp || []);
     };
 
     const handleTimerEnded = ({ losingTeam, winningTeam, cardHolder }) => {
@@ -65,7 +65,6 @@ const GamePage = ({ gameCode, player, gameState, socket, onNextRound }) => {
         ...prev,
         ...state
       }));
-      setGuessedPhrases(state.guessedPhrases || []);
       setShowBuzzer(false);
     };
 
@@ -149,7 +148,8 @@ const GamePage = ({ gameCode, player, gameState, socket, onNextRound }) => {
         {isDescribingPlayer && (
           <DescribingPlayerView
             card={localGameState.currentCard}
-            guessedPhrases={guessedPhrases}
+            guessedPhrasesBlue={localGameState.guessedPhrasesBlue || []}
+            guessedPhrasesOrange={localGameState.guessedPhrasesOrange || []}
             gameCode={gameCode}
             socket={socket}
             cardPassAnimation={cardPassAnimation}

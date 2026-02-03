@@ -96,7 +96,8 @@ io.on('connection', (socket) => {
         describingPlayers: updatedGame.describingPlayers,
         card: updatedGame.currentCard,
         currentCard: updatedGame.currentCard, // Also send as currentCard for consistency
-        guessedPhrases: updatedGame.guessedPhrases,
+        guessedPhrasesBlue: updatedGame.guessedPhrasesBlue,
+        guessedPhrasesOrange: updatedGame.guessedPhrasesOrange,
         scores: updatedGame.scores,
         timerStarted: true
       });
@@ -137,24 +138,32 @@ io.on('connection', (socket) => {
         return;
       }
 
+      // Check if this team is holding the card
+      if (game.cardHolder !== player.team) {
+        socket.emit('error', { message: 'Your team is not holding the card' });
+        return;
+      }
+
       const result = gameManager.markPhraseCorrect(gameCode, phraseIndex);
       const updatedGame = gameManager.getGame(gameCode);
       
       if (result.allGuessed) {
-        // All phrases guessed - both teams get a point
+        // All phrases guessed - both teams get a point (already awarded in gameManager)
         io.to(gameCode).emit('allPhrasesGuessed', {
           card: updatedGame.currentCard,
           scores: updatedGame.scores,
-          guessedPhrases: updatedGame.guessedPhrases
+          guessedPhrasesBlue: updatedGame.guessedPhrasesBlue,
+          guessedPhrasesOrange: updatedGame.guessedPhrasesOrange
         });
       } else {
-        // Card passes to other team
+        // Card passes to other team (same card, guessed phrases persist)
         io.to(gameCode).emit('cardPassed', {
           cardHolder: updatedGame.cardHolder,
           card: updatedGame.currentCard,
           phraseIndex,
           scores: updatedGame.scores,
-          guessedPhrases: updatedGame.guessedPhrases // Reset to empty when card passes
+          guessedPhrasesBlue: updatedGame.guessedPhrasesBlue,
+          guessedPhrasesOrange: updatedGame.guessedPhrasesOrange
         });
       }
 
@@ -221,7 +230,8 @@ io.on('connection', (socket) => {
         describingPlayers: updatedGame.describingPlayers,
         card: updatedGame.currentCard,
         currentCard: updatedGame.currentCard, // Also send as currentCard for consistency
-        guessedPhrases: updatedGame.guessedPhrases,
+        guessedPhrasesBlue: updatedGame.guessedPhrasesBlue,
+        guessedPhrasesOrange: updatedGame.guessedPhrasesOrange,
         scores: updatedGame.scores,
         timerStarted: true
       });

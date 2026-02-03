@@ -54,7 +54,9 @@ const AppContent = () => {
       // Ensure card is mapped to currentCard for consistency
       setGameState({
         ...state,
-        currentCard: state.card || state.currentCard
+        currentCard: state.card || state.currentCard,
+        guessedPhrasesBlue: state.guessedPhrasesBlue || [],
+        guessedPhrasesOrange: state.guessedPhrasesOrange || []
       });
       setCurrentView('game');
       setError(null);
@@ -65,7 +67,9 @@ const AppContent = () => {
       setGameState(prev => ({
         ...prev,
         ...state,
-        currentCard: state.card || state.currentCard // Ensure card is mapped correctly
+        currentCard: state.card || state.currentCard, // Ensure card is mapped correctly
+        guessedPhrasesBlue: state.guessedPhrasesBlue || [],
+        guessedPhrasesOrange: state.guessedPhrasesOrange || []
       }));
     });
 
