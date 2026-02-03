@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Buzzer animation */
+@keyframes buzzer {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.buzzer-active {
+  animation: buzzer 0.3s infinite;
+}
+
+/* Card pass animation */
+@keyframes cardPass {
+  0% { transform: translateX(0) rotate(0deg); }
+  50% { transform: translateX(50px) rotate(5deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+.card-pass-animation {
+  animation: cardPass 0.5s ease-in-out;
+}
