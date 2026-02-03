@@ -154,7 +154,7 @@ io.on('connection', (socket) => {
           card: updatedGame.currentCard,
           phraseIndex,
           scores: updatedGame.scores,
-          guessedPhrases: updatedGame.guessedPhrases
+          guessedPhrases: updatedGame.guessedPhrases // Reset to empty when card passes
         });
       }
 

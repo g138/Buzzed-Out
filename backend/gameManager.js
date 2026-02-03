@@ -204,7 +204,9 @@ class GameManager {
       currentRound: 0,
       cardHolder: null, // 'A' or 'B'
       describingPlayers: [], // IDs of describing players
-      currentCard: null,
+      currentCard: null, // Card currently being played (for the team holding it)
+      teamACard: null, // Card for Team A
+      teamBCard: null, // Card for Team B
       guessedPhrases: [], // Indices of guessed phrases
       scores: {
         A: 0,
@@ -294,12 +296,30 @@ class GameManager {
 
     game.describingPlayers = [descA.id, descB.id];
 
-    // Select a random card and shuffle the phrases for extra randomness
-    const randomCard = CARDS[Math.floor(Math.random() * CARDS.length)];
-    game.currentCard = {
-      id: randomCard.id,
-      phrases: shuffleArray(randomCard.phrases) // Shuffle phrases for randomness
+    // Select different random cards for each team and shuffle the phrases
+    let cardAIndex = Math.floor(Math.random() * CARDS.length);
+    let cardBIndex = Math.floor(Math.random() * CARDS.length);
+    
+    // Ensure teams get different cards
+    while (cardBIndex === cardAIndex && CARDS.length > 1) {
+      cardBIndex = Math.floor(Math.random() * CARDS.length);
+    }
+
+    const cardA = CARDS[cardAIndex];
+    const cardB = CARDS[cardBIndex];
+
+    game.teamACard = {
+      id: cardA.id,
+      phrases: shuffleArray(cardA.phrases) // Shuffle phrases for randomness
     };
+
+    game.teamBCard = {
+      id: cardB.id,
+      phrases: shuffleArray(cardB.phrases) // Shuffle phrases for randomness
+    };
+
+    // Set the current card based on which team starts with it
+    game.currentCard = game.cardHolder === 'A' ? game.teamACard : game.teamBCard;
   }
 
   /**
@@ -319,8 +339,14 @@ class GameManager {
 
     // Pass card to other team
     game.cardHolder = game.cardHolder === 'A' ? 'B' : 'A';
+    
+    // Switch to the other team's card
+    game.currentCard = game.cardHolder === 'A' ? game.teamACard : game.teamBCard;
+    
+    // Reset guessed phrases when card passes (new team, new card)
+    game.guessedPhrases = [];
 
-    // Check if all phrases guessed
+    // Check if all phrases guessed (using the current card)
     const allGuessed = game.guessedPhrases.length === game.currentCard.phrases.length;
     
     if (allGuessed) {

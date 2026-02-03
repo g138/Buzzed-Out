@@ -95,25 +95,31 @@ const GamePage = ({ gameCode, player, gameState, socket, onNextRound }) => {
   const isOpposingTeam = !isDescribingPlayer && player.team !== localGameState.cardHolder;
 
   return (
-    <div className="min-h-screen p-4">
+    <div className="min-h-screen p-4 pb-8">
       {/* Header */}
-      <div className="max-w-6xl mx-auto mb-4">
-        <div className="bg-white rounded-lg p-4 flex justify-between items-center flex-wrap gap-4">
+      <div className="max-w-6xl mx-auto mb-6 fade-in">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-5 shadow-lg border border-white/20 flex justify-between items-center flex-wrap gap-4 hover:shadow-xl transition-shadow duration-300">
           <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
               Round {localGameState.round || 1}
             </h1>
-            <p className="text-gray-600">Game Code: <span className="font-bold">{gameCode}</span></p>
+            <p className="text-gray-600 text-sm mt-1">Game Code: <span className="font-bold text-purple-600">{gameCode}</span></p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-gray-600">Team {player.team}</p>
-            <p className="font-semibold">{player.name}</p>
+            <div className={`inline-block px-4 py-2 rounded-full text-sm font-semibold ${
+              player.team === 'A' 
+                ? 'bg-red-100 text-red-700 border-2 border-red-300' 
+                : 'bg-blue-100 text-blue-700 border-2 border-blue-300'
+            }`}>
+              Team {player.team}
+            </div>
+            <p className="font-semibold text-gray-800 mt-2">{player.name}</p>
           </div>
         </div>
       </div>
 
       {/* Scoreboard */}
-      <div className="max-w-6xl mx-auto mb-4">
+      <div className="max-w-6xl mx-auto mb-6 fade-in" style={{ animationDelay: '0.1s' }}>
         <Scoreboard
           scores={localGameState.scores}
           cardHolder={localGameState.cardHolder}
@@ -121,7 +127,7 @@ const GamePage = ({ gameCode, player, gameState, socket, onNextRound }) => {
       </div>
 
       {/* Timer Indicator */}
-      <div className="max-w-6xl mx-auto mb-4">
+      <div className="max-w-6xl mx-auto mb-6 fade-in" style={{ animationDelay: '0.2s' }}>
         <TimerIndicator
           timerStarted={localGameState.timerStarted}
           timerEnded={localGameState.timerEnded}
@@ -139,7 +145,7 @@ const GamePage = ({ gameCode, player, gameState, socket, onNextRound }) => {
       )}
 
       {/* Role-specific Views */}
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto fade-in" style={{ animationDelay: '0.3s' }}>
         {isDescribingPlayer && (
           <DescribingPlayerView
             card={localGameState.currentCard}

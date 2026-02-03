@@ -27,122 +27,88 @@ const DescribingPlayerView = ({ card, guessedPhrases, gameCode, socket, cardPass
     socket.emit('markCorrect', { gameCode, phraseIndex });
   };
 
-  if (!card || !card.phrases) {
-    return (
-      <div className="bg-white rounded-lg p-8 text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading card...</p>
-      </div>
-    );
-  }
-
-  const allGuessed = guessedPhrases.length === card.phrases.length;
+  // Describing players don't need card data - they just mark phrases correct
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Instructions */}
-      <div className="bg-blue-100 border-2 border-blue-400 rounded-lg p-4">
-        <h2 className="text-xl font-bold text-blue-800 mb-2">You are the Describing Player</h2>
-        <p className="text-blue-700">
-          Describe the phrases to your team. When they guess correctly, click the phrase to pass the card!
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-2xl p-5 shadow-md hover:shadow-lg transition-all duration-300 scale-in">
+        <h2 className="text-xl md:text-2xl font-bold text-blue-800 mb-2 flex items-center gap-2">
+          <span className="text-2xl">🎯</span>
+          You are the Describing Player
+        </h2>
+        <p className="text-blue-700 text-sm md:text-base">
+          Your team is guessing! Listen to their guesses and mark phrases as correct when they guess them right.
+        </p>
+        <p className="text-blue-600 text-xs md:text-sm mt-2 bg-blue-100/50 rounded-lg p-2 inline-block">
+          💡 You cannot see the card - only your guessing teammates can see it.
         </p>
       </div>
 
-      {/* Card with Phrases - Card-like UI */}
-      <div className={`relative bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-2xl p-6 md:p-8 border-4 ${cardHolder === player?.team ? 'border-purple-400' : 'border-purple-300'} ${cardPassAnimation ? 'card-pass-animation' : ''}`}>
-        {/* Card Header */}
-        <div className="text-center mb-6 pb-4 border-b-2 border-purple-200">
-          <div className="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 md:px-6 py-2 rounded-full mb-2">
-            <span className="font-bold text-base md:text-lg">CARD #{card.id}</span>
-          </div>
-          <div className="flex items-center justify-center gap-2 mt-2">
-            <div className={`px-3 py-1 rounded-full text-xs font-bold ${
-              cardHolder === player?.team 
-                ? 'bg-green-100 text-green-800 border-2 border-green-400' 
-                : 'bg-gray-100 text-gray-600'
-            }`}>
-              {cardHolder === player?.team ? '✓ Your Team Has Card' : `Card with Team ${cardHolder}`}
-            </div>
-          </div>
-          <p className="text-gray-600 text-xs md:text-sm mt-2">Click a phrase when your team guesses it correctly</p>
-        </div>
+      {/* No Card Display for Describing Player */}
+      <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-2xl shadow-xl p-8 md:p-10 text-center border-2 border-blue-200 hover:border-blue-300 transition-all duration-300 scale-in" style={{ animationDelay: '0.1s' }}>
+        <div className="text-7xl mb-4 animate-pulse">🎯</div>
+        <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-3">You Cannot See The Card</h3>
+        <p className="text-gray-600 mb-4 text-base md:text-lg">
+          Only your guessing teammates can see the card with the phrases.
+        </p>
+        <p className="text-gray-700 font-semibold text-sm md:text-base bg-white/60 rounded-lg p-3 inline-block">
+          Listen to their guesses and mark phrases as correct when they get them right!
+        </p>
+      </div>
 
-        {/* Phrases Grid - 2 columns, 5 rows */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-          {card.phrases.map((phrase, index) => {
-            const isGuessed = guessedPhrases.includes(index);
-            const phraseNumber = index + 1;
+      {/* Mark Correct Interface - Simple buttons for phrases 1-10 */}
+      <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 md:p-8 hover:shadow-2xl transition-all duration-300 scale-in" style={{ animationDelay: '0.2s' }}>
+        <h3 className="text-xl md:text-2xl font-bold mb-2 text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          Mark Phrases as Correct
+        </h3>
+        <p className="text-gray-600 text-center mb-6 text-sm md:text-base">
+          Click a number when your team guesses that phrase correctly
+        </p>
+        <div className="grid grid-cols-5 md:grid-cols-10 gap-3 md:gap-4">
+          {Array.from({ length: 10 }, (_, i) => {
+            const isGuessed = guessedPhrases.includes(i);
             return (
               <button
-                key={index}
-                onClick={() => handleMarkCorrect(index)}
+                key={i}
+                onClick={() => handleMarkCorrect(i)}
                 disabled={isGuessed}
-                className={`relative group p-4 md:p-5 rounded-xl text-left transition-all transform ${
+                className={`p-4 md:p-5 rounded-xl font-bold text-lg md:text-xl transition-all duration-200 ${
                   isGuessed
-                    ? 'bg-gray-200 text-gray-500 line-through cursor-not-allowed opacity-60'
-                    : 'bg-gradient-to-br from-purple-50 to-blue-50 hover:from-purple-100 hover:to-blue-100 cursor-pointer border-2 border-purple-200 hover:border-purple-400 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-100'
+                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed opacity-60 scale-95'
+                    : 'bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-500 text-white hover:from-blue-600 hover:via-purple-600 hover:to-indigo-600 shadow-lg hover:shadow-xl transform hover:scale-110 active:scale-95'
                 }`}
               >
-                {/* Phrase Number Badge */}
-                <div className={`absolute -top-2 -left-2 w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-                  isGuessed 
-                    ? 'bg-gray-400 text-white' 
-                    : 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-md'
-                }`}>
-                  {phraseNumber}
-                </div>
-                
-                {/* Phrase Text */}
-                <div className="pl-5 md:pl-6">
-                  <span className={`font-semibold text-base md:text-lg block ${isGuessed ? 'line-through' : 'text-gray-800'}`}>
-                    {phrase}
-                  </span>
-                  {isGuessed && (
-                    <div className="mt-2 flex items-center text-green-600">
-                      <svg className="w-4 h-4 md:w-5 md:h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="text-xs md:text-sm font-medium">Guessed!</span>
-                    </div>
-                  )}
-                  {!isGuessed && (
-                    <div className="mt-1 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                      Click to mark as correct
-                    </div>
-                  )}
-                </div>
+                <span className="block">{i + 1}</span>
+                {isGuessed && (
+                  <span className="block text-xs md:text-sm mt-1 animate-pulse">✓</span>
+                )}
               </button>
             );
           })}
         </div>
+      </div>
 
-        {/* Progress Indicator */}
-        <div className="mt-6 pt-4 border-t-2 border-purple-200">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-gray-700">
-              Progress: {guessedPhrases.length} / {card.phrases.length} phrases guessed
-            </span>
-            <span className="text-sm font-bold text-purple-600">
-              {Math.round((guessedPhrases.length / card.phrases.length) * 100)}%
-            </span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-            <div 
-              className="bg-gradient-to-r from-purple-500 to-blue-500 h-3 rounded-full transition-all duration-300"
-              style={{ width: `${(guessedPhrases.length / card.phrases.length) * 100}%` }}
-            ></div>
-          </div>
+      {/* Progress Indicator */}
+      <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 md:p-8 hover:shadow-2xl transition-all duration-300 scale-in" style={{ animationDelay: '0.3s' }}>
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-sm md:text-base font-semibold text-gray-700">
+            Progress: <span className="text-blue-600">{guessedPhrases.length}</span> / 10 phrases guessed
+          </span>
+          <span className="text-lg md:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            {Math.round((guessedPhrases.length / 10) * 100)}%
+          </span>
         </div>
-
-        {/* All Guessed Message */}
-        {allGuessed && (
-          <div className="mt-6 bg-gradient-to-r from-green-400 to-emerald-500 rounded-xl p-6 text-center shadow-lg animate-pulse">
-            <div className="text-4xl mb-2">🎉</div>
-            <p className="text-white font-bold text-xl">
-              All phrases guessed!
-            </p>
-            <p className="text-white text-sm mt-1">
-              Both teams get a point!
+        <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden shadow-inner">
+          <div 
+            className="bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 h-4 rounded-full transition-all duration-500 ease-out shadow-md"
+            style={{ width: `${(guessedPhrases.length / 10) * 100}%` }}
+          ></div>
+        </div>
+        {guessedPhrases.length === 10 && (
+          <div className="mt-6 bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500 rounded-2xl p-5 md:p-6 text-center shadow-xl animate-pulse scale-in">
+            <p className="text-white font-bold text-lg md:text-xl">
+              🎉 All phrases guessed! Both teams get a point!
             </p>
           </div>
         )}
@@ -150,16 +116,19 @@ const DescribingPlayerView = ({ card, guessedPhrases, gameCode, socket, cardPass
 
       {/* Recent Guesses */}
       {receivedGuesses.length > 0 && (
-        <div className="bg-white rounded-lg shadow-lg p-4">
-          <h3 className="font-bold mb-2">Recent Guesses from Your Team</h3>
-          <div className="space-y-2 max-h-40 overflow-y-auto">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-5 md:p-6 hover:shadow-2xl transition-all duration-300 scale-in" style={{ animationDelay: '0.4s' }}>
+          <h3 className="font-bold mb-4 text-lg md:text-xl text-gray-800">Recent Guesses from Your Team</h3>
+          <div className="space-y-2 max-h-48 overflow-y-auto">
             {receivedGuesses.map((item, idx) => (
               <div
                 key={idx}
-                className="bg-gray-50 rounded p-2 text-sm"
+                className="bg-gradient-to-r from-gray-50 to-blue-50/50 rounded-lg p-3 text-sm md:text-base border border-gray-200 hover:border-blue-300 transition-all duration-200 slide-in-right"
+                style={{ animationDelay: `${idx * 0.05}s` }}
               >
-                <span className="font-semibold">{item.fromPlayer}</span>
-                <span className="text-gray-600">: "{item.guess}"</span>
+                <span className="font-semibold text-blue-700">{item.fromPlayer}</span>
+                <span className="text-gray-600">: "</span>
+                <span className="text-gray-800 font-medium">{item.guess}</span>
+                <span className="text-gray-600">"</span>
               </div>
             ))}
           </div>

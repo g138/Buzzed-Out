@@ -9,11 +9,60 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* Smooth fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Slide in from right */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slide-in-right {
+  animation: slideInRight 0.5s ease-out;
+}
+
+/* Scale in animation */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.scale-in {
+  animation: scaleIn 0.3s ease-out;
 }
 
 /* Buzzer animation */
@@ -26,13 +75,63 @@ code {
   animation: buzzer 0.3s infinite;
 }
 
-/* Card pass animation */
+/* Card pass animation - smoother */
 @keyframes cardPass {
-  0% { transform: translateX(0) rotate(0deg); }
-  50% { transform: translateX(50px) rotate(5deg); }
-  100% { transform: translateX(0) rotate(0deg); }
+  0% { 
+    transform: translateX(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  50% { 
+    transform: translateX(30px) rotate(3deg) scale(1.02);
+    opacity: 0.8;
+  }
+  100% { 
+    transform: translateX(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
 }
 
 .card-pass-animation {
-  animation: cardPass 0.5s ease-in-out;
+  animation: cardPass 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Pulse animation for active elements */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
