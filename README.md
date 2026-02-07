@@ -1,6 +1,8 @@
-# Pass the Card - Multiplayer Party Game
+# Buzzed Out - Pass the Card | Free Online Multiplayer Party Game
 
-A real-time multiplayer party game where two teams compete by passing a card back and forth by correctly guessing phrases. The team holding the card when the hidden timer ends loses!
+**Buzzed Out** (also known as **Pass the Card**) is a free online multiplayer party game where two teams compete by passing a card back and forth by correctly guessing phrases. The team holding the card when the hidden timer ends loses! Play instantly in your browser - no download required.
+
+**Keywords**: Buzzed Out, Pass the Card, online party game, multiplayer word game, free online game, team guessing game, real-time multiplayer, card game online, buzzed out game
 
 ## Game Rules
 
