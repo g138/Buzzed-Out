@@ -3,6 +3,16 @@ import { SocketProvider, useSocket } from './contexts/SocketContext';
 import LandingPage from './components/LandingPage';
 import LobbyPage from './components/LobbyPage';
 import GamePage from './components/GamePage';
+import {
+  trackPageView,
+  trackGameCreated,
+  trackGameJoined,
+  trackGameStarted,
+  trackRoundStarted,
+  trackCardPassed,
+  trackGameFinished,
+  trackTimerEnded,
+} from './utils/analytics';
 
 // Main app component that uses socket
 const AppContent = () => {
@@ -12,6 +22,16 @@ const AppContent = () => {
   const [player, setPlayer] = useState(null);
   const [gameState, setGameState] = useState(null);
   const [error, setError] = useState(null);
+
+  // Track page views when view changes
+  useEffect(() => {
+    const pageTitles = {
+      landing: 'Landing Page',
+      lobby: 'Lobby',
+      game: 'Game',
+    };
+    trackPageView(`/${currentView}`, pageTitles[currentView] || 'Unknown');
+  }, [currentView]);
 
   useEffect(() => {
     if (!socket) return;
@@ -30,6 +50,8 @@ const AppContent = () => {
       });
       setCurrentView('lobby');
       setError(null);
+      // Track analytics
+      trackGameCreated(code);
     });
 
     // Listen for game joined
@@ -38,6 +60,8 @@ const AppContent = () => {
       setPlayer(p);
       setCurrentView('lobby');
       setError(null);
+      // Track analytics
+      trackGameJoined(code);
     });
 
     // Listen for player joined (update lobby)
@@ -60,6 +84,9 @@ const AppContent = () => {
       });
       setCurrentView('game');
       setError(null);
+      // Track analytics
+      const playerCount = state.players?.length || 0;
+      trackGameStarted(gameCode, playerCount);
     });
 
     // Listen for round started
@@ -71,16 +98,32 @@ const AppContent = () => {
         guessedPhrasesBlue: state.guessedPhrasesBlue || [],
         guessedPhrasesOrange: state.guessedPhrasesOrange || []
       }));
+      // Track analytics
+      const roundNumber = state.round || 1;
+      trackRoundStarted(gameCode, roundNumber);
     });
 
     // Listen for card passed
     socket.on('cardPassed', ({ cardHolder, card, phraseIndex, scores }) => {
-      setGameState(prev => ({
-        ...prev,
-        cardHolder,
-        currentCard: card,
-        scores
-      }));
+      setGameState(prev => {
+        // Determine which team passed and received the card
+        const previousHolder = prev?.cardHolder;
+        const newHolder = cardHolder;
+        const fromTeam = previousHolder === 'A' ? 'A' : previousHolder === 'B' ? 'B' : null;
+        const toTeam = newHolder === 'A' ? 'A' : newHolder === 'B' ? 'B' : null;
+        
+        // Track analytics
+        if (fromTeam && toTeam && fromTeam !== toTeam) {
+          trackCardPassed(gameCode, fromTeam, toTeam);
+        }
+        
+        return {
+          ...prev,
+          cardHolder,
+          currentCard: card,
+          scores
+        };
+      });
     });
 
     // Listen for all phrases guessed
@@ -101,6 +144,8 @@ const AppContent = () => {
         winningTeam,
         cardHolder
       }));
+      // Track analytics
+      trackTimerEnded(gameCode, losingTeam);
     });
 
     // Listen for game finished
@@ -112,6 +157,10 @@ const AppContent = () => {
         scores,
         round
       }));
+      // Track analytics
+      const finalScoreA = scores?.A || 0;
+      const finalScoreB = scores?.B || 0;
+      trackGameFinished(gameCode, winner, finalScoreA, finalScoreB);
     });
 
     // Listen for errors
