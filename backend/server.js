@@ -104,11 +104,25 @@ io.on('connection', (socket) => {
 
       // Start the hidden timer
       gameManager.startTimer(gameCode, (winner) => {
-        io.to(gameCode).emit('timerEnded', { 
-          losingTeam: winner === 'A' ? 'B' : 'A',
-          winningTeam: winner,
-          cardHolder: updatedGame.cardHolder
-        });
+        const currentGame = gameManager.getGame(gameCode);
+        // Check if this is the last round
+        if (currentGame.currentRound >= 8) {
+          // Game finished - determine winner
+          currentGame.status = 'finished';
+          const finalWinner = currentGame.scores.A > currentGame.scores.B ? 'A' : 
+                             currentGame.scores.B > currentGame.scores.A ? 'B' : 'tie';
+          io.to(gameCode).emit('gameFinished', {
+            winner: finalWinner,
+            scores: currentGame.scores,
+            round: currentGame.currentRound
+          });
+        } else {
+          io.to(gameCode).emit('timerEnded', { 
+            losingTeam: winner === 'A' ? 'B' : 'A',
+            winningTeam: winner,
+            cardHolder: updatedGame.cardHolder
+          });
+        }
       });
 
       console.log(`Game ${gameCode} started`);
@@ -221,31 +235,56 @@ io.on('connection', (socket) => {
         return;
       }
 
-      gameManager.nextRound(gameCode);
+      const result = gameManager.nextRound(gameCode);
       const updatedGame = gameManager.getGame(gameCode);
       
-      io.to(gameCode).emit('roundStarted', {
-        round: updatedGame.currentRound,
-        cardHolder: updatedGame.cardHolder,
-        describingPlayers: updatedGame.describingPlayers,
-        card: updatedGame.currentCard,
-        currentCard: updatedGame.currentCard, // Also send as currentCard for consistency
-        guessedPhrasesBlue: updatedGame.guessedPhrasesBlue,
-        guessedPhrasesOrange: updatedGame.guessedPhrasesOrange,
-        scores: updatedGame.scores,
-        timerStarted: true
-      });
-
-      // Start timer for new round
-      gameManager.startTimer(gameCode, (winner) => {
-        io.to(gameCode).emit('timerEnded', { 
-          losingTeam: winner === 'A' ? 'B' : 'A',
-          winningTeam: winner,
-          cardHolder: updatedGame.cardHolder
+      if (result.gameFinished) {
+        // Game finished - send winner
+        io.to(gameCode).emit('gameFinished', {
+          winner: result.winner,
+          scores: result.scores,
+          round: updatedGame.currentRound
         });
-      });
+        console.log(`Game ${gameCode} finished. Winner: Team ${result.winner}`);
+      } else {
+        // Continue to next round
+        io.to(gameCode).emit('roundStarted', {
+          round: updatedGame.currentRound,
+          cardHolder: updatedGame.cardHolder,
+          describingPlayers: updatedGame.describingPlayers,
+          card: updatedGame.currentCard,
+          currentCard: updatedGame.currentCard, // Also send as currentCard for consistency
+          guessedPhrasesBlue: updatedGame.guessedPhrasesBlue,
+          guessedPhrasesOrange: updatedGame.guessedPhrasesOrange,
+          scores: updatedGame.scores,
+          timerStarted: true
+        });
 
-      console.log(`Round ${updatedGame.currentRound} started in game ${gameCode}`);
+        // Start timer for new round
+        gameManager.startTimer(gameCode, (winner) => {
+          const currentGame = gameManager.getGame(gameCode);
+          // Check if this is the last round
+          if (currentGame.currentRound >= 8) {
+            // Game finished - determine winner
+            currentGame.status = 'finished';
+            const finalWinner = currentGame.scores.A > currentGame.scores.B ? 'A' : 
+                               currentGame.scores.B > currentGame.scores.A ? 'B' : 'tie';
+            io.to(gameCode).emit('gameFinished', {
+              winner: finalWinner,
+              scores: currentGame.scores,
+              round: currentGame.currentRound
+            });
+          } else {
+            io.to(gameCode).emit('timerEnded', { 
+              losingTeam: winner === 'A' ? 'B' : 'A',
+              winningTeam: winner,
+              cardHolder: updatedGame.cardHolder
+            });
+          }
+        });
+
+        console.log(`Round ${updatedGame.currentRound} started in game ${gameCode}`);
+      }
     } catch (error) {
       socket.emit('error', { message: error.message });
     }

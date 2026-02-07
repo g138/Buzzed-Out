@@ -29,33 +29,6 @@ const GuessingPlayerView = ({ gameCode, socket, player, cardHolder, card, guesse
           <span className="text-2xl">👂</span>
           You are a Guessing Player
         </h2>
-        <p className="text-green-700 text-sm md:text-base">
-          Your team is holding the card! Listen to your describing player's clues and call out your guesses verbally.
-        </p>
-        <p className="text-green-600 text-xs md:text-sm mt-2 bg-green-100/50 rounded-lg p-2 inline-block">
-          💡 Only the describing player can see the card - you cannot see it. Listen and guess!
-        </p>
-      </div>
-
-      {/* Listening Indicator */}
-      <div className="bg-gradient-to-br from-white to-green-50/30 rounded-2xl shadow-xl p-8 md:p-10 text-center border-2 border-green-200 hover:border-green-300 transition-all duration-300 scale-in" style={{ animationDelay: '0.1s' }}>
-        <div className="text-7xl mb-4 animate-pulse">👂</div>
-        <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-3">Listen & Guess!</h3>
-        <p className="text-gray-600 text-base md:text-lg">
-          Pay attention to your describing player's clues and shout out your guesses!
-        </p>
-      </div>
-
-      {/* No Card Display - Guessing Players Cannot See Card */}
-      <div className="bg-gradient-to-br from-white to-green-50/30 rounded-2xl shadow-xl p-8 md:p-10 text-center border-2 border-green-200 hover:border-green-300 transition-all duration-300 scale-in" style={{ animationDelay: '0.2s' }}>
-        <div className="text-7xl mb-4 animate-pulse">🚫</div>
-        <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-3">You Cannot See The Card</h3>
-        <p className="text-gray-600 mb-4 text-base md:text-lg">
-          Only your describing player can see the card with the phrases.
-        </p>
-        <p className="text-gray-700 font-semibold text-sm md:text-base bg-white/60 rounded-lg p-3 inline-block">
-          Listen to your describing player's clues and call out your guesses!
-        </p>
       </div>
 
       {/* Recent Guesses */}
@@ -84,13 +57,6 @@ const GuessingPlayerView = ({ gameCode, socket, player, cardHolder, card, guesse
           </div>
         </div>
       )}
-
-      {/* Waiting Message */}
-      <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-300 rounded-2xl p-5 md:p-6 text-center shadow-md hover:shadow-lg transition-all duration-300 scale-in" style={{ animationDelay: '0.4s' }}>
-        <p className="text-yellow-800 text-sm md:text-base font-medium">
-          ⏳ Waiting for your describing player to mark a phrase as correct...
-        </p>
-      </div>
     </div>
   );
 };

@@ -287,6 +287,8 @@ function shuffleArray(array) {
   return shuffled;
 }
 
+const MAX_ROUNDS = 8;
+
 class GameManager {
   constructor() {
     this.games = new Map();
@@ -436,9 +438,10 @@ class GameManager {
     }
 
     // Determine which side's phrases to check based on card holder
-    const isBlueSide = game.cardHolder === 'A';
-    const guessedPhrases = isBlueSide ? game.guessedPhrasesBlue : game.guessedPhrasesOrange;
-    const phrases = isBlueSide ? game.currentCard.blueSide : game.currentCard.orangeSide;
+    // Team A sees Orange side, Team B sees Blue side
+    const isOrangeSide = game.cardHolder === 'A';
+    const guessedPhrases = isOrangeSide ? game.guessedPhrasesOrange : game.guessedPhrasesBlue;
+    const phrases = isOrangeSide ? game.currentCard.orangeSide : game.currentCard.blueSide;
 
     if (guessedPhrases.includes(phraseIndex)) {
       throw new Error('Phrase already guessed');
@@ -508,6 +511,15 @@ class GameManager {
       throw new Error('Game not found');
     }
 
+    // Check if maximum rounds reached
+    if (game.currentRound >= MAX_ROUNDS) {
+      // Game finished - determine winner
+      game.status = 'finished';
+      const winner = game.scores.A > game.scores.B ? 'A' : 
+                     game.scores.B > game.scores.A ? 'B' : 'tie';
+      return { gameFinished: true, winner, scores: game.scores };
+    }
+
     // Clear timer
     if (this.timers.has(gameCode)) {
       clearTimeout(this.timers.get(gameCode));
@@ -515,6 +527,25 @@ class GameManager {
     }
 
     this.startRound(gameCode);
+    return { gameFinished: false };
+  }
+
+  /**
+   * Get winner after game ends
+   */
+  getWinner(gameCode) {
+    const game = this.games.get(gameCode);
+    if (!game) {
+      return null;
+    }
+
+    if (game.scores.A > game.scores.B) {
+      return 'A';
+    } else if (game.scores.B > game.scores.A) {
+      return 'B';
+    } else {
+      return 'tie';
+    }
   }
 
   /**

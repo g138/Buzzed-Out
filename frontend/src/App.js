@@ -103,6 +103,17 @@ const AppContent = () => {
       }));
     });
 
+    // Listen for game finished
+    socket.on('gameFinished', ({ winner, scores, round }) => {
+      setGameState(prev => ({
+        ...prev,
+        gameFinished: true,
+        winner,
+        scores,
+        round
+      }));
+    });
+
     // Listen for errors
     socket.on('error', ({ message }) => {
       setError(message);
@@ -117,6 +128,7 @@ const AppContent = () => {
       socket.off('cardPassed');
       socket.off('allPhrasesGuessed');
       socket.off('timerEnded');
+      socket.off('gameFinished');
       socket.off('error');
     };
   }, [socket]);
@@ -149,6 +161,14 @@ const AppContent = () => {
       ...prev,
       timerEnded: false
     }));
+  };
+
+  const handleNewGame = () => {
+    // Reset game state and return to landing
+    setGameCode(null);
+    setPlayer(null);
+    setGameState(null);
+    setCurrentView('landing');
   };
 
   return (
@@ -196,6 +216,7 @@ const AppContent = () => {
           gameState={gameState}
           socket={socket}
           onNextRound={handleNextRound}
+          onNewGame={handleNewGame}
         />
       )}
     </div>

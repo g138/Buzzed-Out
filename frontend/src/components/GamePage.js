@@ -5,12 +5,15 @@ import DescribingPlayerView from './DescribingPlayerView';
 import GuessingPlayerView from './GuessingPlayerView';
 import OpposingTeamView from './OpposingTeamView';
 import BuzzerAlert from './BuzzerAlert';
+import WinnerScreen from './WinnerScreen';
 
-const GamePage = ({ gameCode, player, gameState, socket, onNextRound }) => {
+const GamePage = ({ gameCode, player, gameState, socket, onNextRound, onNewGame }) => {
   const [localGameState, setLocalGameState] = useState(gameState);
   const [guessedPhrases, setGuessedPhrases] = useState([]);
   const [showBuzzer, setShowBuzzer] = useState(false);
   const [cardPassAnimation, setCardPassAnimation] = useState(false);
+  const [showWinner, setShowWinner] = useState(false);
+  const [winnerData, setWinnerData] = useState(null);
 
   useEffect(() => {
     setLocalGameState(gameState);
@@ -68,16 +71,24 @@ const GamePage = ({ gameCode, player, gameState, socket, onNextRound }) => {
       setShowBuzzer(false);
     };
 
+    const handleGameFinished = ({ winner, scores, round }) => {
+      setWinnerData({ winner, scores, round });
+      setShowWinner(true);
+      setShowBuzzer(false);
+    };
+
     socket.on('cardPassed', handleCardPassed);
     socket.on('allPhrasesGuessed', handleAllPhrasesGuessed);
     socket.on('timerEnded', handleTimerEnded);
     socket.on('roundStarted', handleRoundStarted);
+    socket.on('gameFinished', handleGameFinished);
 
     return () => {
       socket.off('cardPassed', handleCardPassed);
       socket.off('allPhrasesGuessed', handleAllPhrasesGuessed);
       socket.off('timerEnded', handleTimerEnded);
       socket.off('roundStarted', handleRoundStarted);
+      socket.off('gameFinished', handleGameFinished);
     };
   }, [socket]);
 
@@ -89,9 +100,11 @@ const GamePage = ({ gameCode, player, gameState, socket, onNextRound }) => {
     );
   }
 
-  const isDescribingPlayer = localGameState.describingPlayers?.includes(player.id);
-  const isGuessingPlayer = !isDescribingPlayer && player.team === localGameState.cardHolder;
-  const isOpposingTeam = !isDescribingPlayer && player.team !== localGameState.cardHolder;
+  const isDescribingPlayer = player && localGameState.describingPlayers?.includes(player.id);
+  const isDescribingPlayerWithCard = isDescribingPlayer && player?.team === localGameState.cardHolder;
+  const isDescribingPlayerWithoutCard = isDescribingPlayer && player?.team !== localGameState.cardHolder;
+  const isGuessingPlayer = !isDescribingPlayer && player?.team === localGameState.cardHolder;
+  const isOpposingTeam = !isDescribingPlayer && player?.team !== localGameState.cardHolder;
 
   return (
     <div className="min-h-screen p-4 pb-8">
@@ -100,19 +113,19 @@ const GamePage = ({ gameCode, player, gameState, socket, onNextRound }) => {
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-5 shadow-lg border border-white/20 flex justify-between items-center flex-wrap gap-4 hover:shadow-xl transition-shadow duration-300">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Round {localGameState.round || 1}
+              Round {localGameState.round || 1} / 8
             </h1>
             <p className="text-gray-600 text-sm mt-1">Game Code: <span className="font-bold text-purple-600">{gameCode}</span></p>
           </div>
           <div className="text-right">
             <div className={`inline-block px-4 py-2 rounded-full text-sm font-semibold ${
-              player.team === 'A' 
+              player?.team === 'A' 
                 ? 'bg-red-100 text-red-700 border-2 border-red-300' 
                 : 'bg-blue-100 text-blue-700 border-2 border-blue-300'
             }`}>
-              Team {player.team}
+              Team {player?.team || '?'}
             </div>
-            <p className="font-semibold text-gray-800 mt-2">{player.name}</p>
+            <p className="font-semibold text-gray-800 mt-2">{player?.name || 'Unknown'}</p>
           </div>
         </div>
       </div>
@@ -140,12 +153,24 @@ const GamePage = ({ gameCode, player, gameState, socket, onNextRound }) => {
           winningTeam={localGameState.winningTeam}
           onClose={() => setShowBuzzer(false)}
           onNextRound={onNextRound}
+          currentRound={localGameState.round || 1}
+          maxRounds={8}
+        />
+      )}
+
+      {/* Winner Screen */}
+      {showWinner && winnerData && (
+        <WinnerScreen
+          winner={winnerData.winner}
+          scores={winnerData.scores}
+          onNewGame={onNewGame}
         />
       )}
 
       {/* Role-specific Views */}
       <div className="max-w-6xl mx-auto fade-in" style={{ animationDelay: '0.3s' }}>
-        {isDescribingPlayer && (
+        {/* Describing Player WITH Card - Can see the card */}
+        {isDescribingPlayerWithCard && (
           <DescribingPlayerView
             card={localGameState.currentCard}
             guessedPhrasesBlue={localGameState.guessedPhrasesBlue || []}
@@ -158,14 +183,22 @@ const GamePage = ({ gameCode, player, gameState, socket, onNextRound }) => {
           />
         )}
 
+        {/* Describing Player WITHOUT Card - Cannot see the card */}
+        {isDescribingPlayerWithoutCard && (
+          <OpposingTeamView
+            cardHolder={localGameState.cardHolder}
+            scores={localGameState.scores}
+            isDescribingPlayer={true}
+            player={player}
+          />
+        )}
+
         {isGuessingPlayer && (
           <GuessingPlayerView
             gameCode={gameCode}
             socket={socket}
             player={player}
             cardHolder={localGameState.cardHolder}
-            card={localGameState.currentCard}
-            guessedPhrases={guessedPhrases}
           />
         )}
 
@@ -173,6 +206,8 @@ const GamePage = ({ gameCode, player, gameState, socket, onNextRound }) => {
           <OpposingTeamView
             cardHolder={localGameState.cardHolder}
             scores={localGameState.scores}
+            isDescribingPlayer={false}
+            player={player}
           />
         )}
       </div>

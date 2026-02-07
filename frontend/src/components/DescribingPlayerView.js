@@ -35,11 +35,12 @@ const DescribingPlayerView = ({ card, guessedPhrasesBlue, guessedPhrasesOrange, 
   };
 
   // Determine which side to show based on team
-  const isBlueSide = player?.team === 'A';
-  const phrases = card ? (isBlueSide ? card.blueSide : card.orangeSide) : [];
-  const guessedPhrases = isBlueSide ? guessedPhrasesBlue : guessedPhrasesOrange;
-  const sideColor = isBlueSide ? 'blue' : 'orange';
-  const sideName = isBlueSide ? 'Blue' : 'Orange';
+  // Team A sees Orange side, Team B sees Blue side
+  const isOrangeSide = player?.team === 'A';
+  const phrases = card ? (isOrangeSide ? card.orangeSide : card.blueSide) : [];
+  const guessedPhrases = isOrangeSide ? guessedPhrasesOrange : guessedPhrasesBlue;
+  const sideColor = isOrangeSide ? 'orange' : 'blue';
+  const sideName = isOrangeSide ? 'Orange' : 'Blue';
 
   if (!card || !phrases || phrases.length === 0) {
     return (
@@ -55,37 +56,15 @@ const DescribingPlayerView = ({ card, guessedPhrasesBlue, guessedPhrasesOrange, 
   return (
     <div className="space-y-6">
       {/* Instructions */}
-      <div className={`bg-gradient-to-r ${isBlueSide ? 'from-blue-50 to-indigo-50 border-blue-300' : 'from-orange-50 to-red-50 border-orange-300'} border-2 rounded-2xl p-5 shadow-md hover:shadow-lg transition-all duration-300 scale-in`}>
-        <h2 className={`text-xl md:text-2xl font-bold ${isBlueSide ? 'text-blue-800' : 'text-orange-800'} mb-2 flex items-center gap-2`}>
+      <div className={`bg-gradient-to-r ${isOrangeSide ? 'from-orange-50 to-red-50 border-orange-300' : 'from-blue-50 to-indigo-50 border-blue-300'} border-2 rounded-2xl p-5 shadow-md hover:shadow-lg transition-all duration-300 scale-in`}>
+        <h2 className={`text-xl md:text-2xl font-bold ${isOrangeSide ? 'text-orange-800' : 'text-blue-800'} mb-2 flex items-center gap-2`}>
           <span className="text-2xl">🎯</span>
           You are the Describing Player
         </h2>
-        <p className={`${isBlueSide ? 'text-blue-700' : 'text-orange-700'} text-sm md:text-base`}>
-          You can see the <span className={`font-bold ${isBlueSide ? 'text-blue-900' : 'text-orange-900'}`}>{sideName} side</span> of the card! Select any phrase and describe it to your team using only your voice (no gestures).
-        </p>
-        <p className={`${isBlueSide ? 'text-blue-600 bg-blue-100/50' : 'text-orange-600 bg-orange-100/50'} text-xs md:text-sm mt-2 rounded-lg p-2 inline-block`}>
-          💡 Rules: Only voice descriptions allowed. Cannot use any part of the word/phrase. Mark correct when guessed!
-        </p>
       </div>
 
       {/* Card Display - Only Describing Player Sees This */}
-      <div className={`bg-gradient-to-br from-white/95 ${isBlueSide ? 'to-blue-50/40' : 'to-orange-50/40'} backdrop-blur-sm rounded-2xl shadow-2xl p-6 md:p-8 border-2 ${isBlueSide ? 'border-blue-300 hover:border-blue-400' : 'border-orange-300 hover:border-orange-400'} transition-all duration-300 scale-in ${cardPassAnimation ? 'card-pass-animation' : ''}`} style={{ animationDelay: '0.1s' }}>
-        <div className={`text-center mb-6 pb-4 border-b-2 ${isBlueSide ? 'border-blue-200' : 'border-orange-200'}`}>
-          <div className={`inline-block bg-gradient-to-r ${isBlueSide ? 'from-blue-600 via-indigo-600 to-blue-700' : 'from-orange-600 via-red-600 to-orange-700'} text-white px-5 md:px-7 py-2.5 rounded-full mb-3 shadow-lg`}>
-            <span className="font-bold text-base md:text-lg">CARD #{card.id} - {sideName} Side</span>
-          </div>
-          <div className="flex items-center justify-center gap-2 mt-2">
-            <div className={`px-3 py-1 rounded-full text-xs font-bold ${
-              cardHolder === player?.team 
-                ? 'bg-green-100 text-green-800 border-2 border-green-400' 
-                : 'bg-gray-100 text-gray-600'
-            }`}>
-              {cardHolder === player?.team ? '✓ Your Team Has Card' : `Card with Team ${cardHolder}`}
-            </div>
-          </div>
-          <p className="text-gray-600 text-xs md:text-sm mt-2">Click a phrase when your team guesses it correctly</p>
-        </div>
-
+      <div className={`bg-gradient-to-br from-white/95 ${isOrangeSide ? 'to-orange-50/40' : 'to-blue-50/40'} backdrop-blur-sm rounded-2xl shadow-2xl p-6 md:p-8 border-2 ${isOrangeSide ? 'border-orange-300 hover:border-orange-400' : 'border-blue-300 hover:border-blue-400'} transition-all duration-300 scale-in ${cardPassAnimation ? 'card-pass-animation' : ''}`} style={{ animationDelay: '0.1s' }}>
         {/* Phrases Grid - 2 columns, 5 rows */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           {phrases.map((phrase, index) => {
@@ -100,9 +79,9 @@ const DescribingPlayerView = ({ card, guessedPhrasesBlue, guessedPhrasesOrange, 
                   isGuessed
                     ? 'bg-gray-200 text-gray-500 line-through cursor-not-allowed opacity-60 scale-95'
                     : cardHolder === player?.team 
-                      ? isBlueSide
-                        ? 'bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 cursor-pointer border-2 border-blue-200 hover:border-blue-400 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-100'
-                        : 'bg-gradient-to-br from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100 cursor-pointer border-2 border-orange-200 hover:border-orange-400 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-100'
+                      ? isOrangeSide
+                        ? 'bg-gradient-to-br from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100 cursor-pointer border-2 border-orange-200 hover:border-orange-400 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-100'
+                        : 'bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 cursor-pointer border-2 border-blue-200 hover:border-blue-400 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-100'
                       : 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50 border-2 border-gray-200'
                 }`}
               >
@@ -110,9 +89,9 @@ const DescribingPlayerView = ({ card, guessedPhrasesBlue, guessedPhrasesOrange, 
                 <div className={`absolute -top-2 -left-2 w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
                   isGuessed 
                     ? 'bg-gray-400 text-white' 
-                    : isBlueSide
-                      ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-md hover:shadow-xl'
-                      : 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md hover:shadow-xl'
+                    : isOrangeSide
+                      ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md hover:shadow-xl'
+                      : 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-md hover:shadow-xl'
                 }`}>
                   {phraseNumber}
                 </div>
@@ -141,23 +120,6 @@ const DescribingPlayerView = ({ card, guessedPhrasesBlue, guessedPhrasesOrange, 
           })}
         </div>
 
-        {/* Progress Indicator */}
-        <div className={`mt-6 pt-4 border-t-2 ${isBlueSide ? 'border-blue-200' : 'border-orange-200'}`}>
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm md:text-base font-semibold text-gray-700">
-              Progress: <span className={isBlueSide ? 'text-blue-600' : 'text-orange-600'}>{guessedPhrases?.length || 0}</span> / {phrases.length} phrases guessed
-            </span>
-            <span className={`text-lg md:text-xl font-bold bg-gradient-to-r ${isBlueSide ? 'from-blue-600 to-indigo-600' : 'from-orange-600 to-red-600'} bg-clip-text text-transparent`}>
-              {Math.round(((guessedPhrases?.length || 0) / phrases.length) * 100)}%
-            </span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden shadow-inner">
-            <div 
-              className={`h-4 rounded-full transition-all duration-500 ease-out shadow-md ${isBlueSide ? 'bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-600' : 'bg-gradient-to-r from-orange-500 via-red-500 to-orange-600'}`}
-              style={{ width: `${((guessedPhrases?.length || 0) / phrases.length) * 100}%` }}
-            ></div>
-          </div>
-        </div>
 
         {/* All Guessed Message */}
         {allGuessed && (
