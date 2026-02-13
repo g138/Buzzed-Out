@@ -24,10 +24,13 @@ const LandingPage = ({ onCreateGame, onJoinGame, connected }) => {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 max-w-md w-full">
           <h1 className="text-4xl md:text-5xl font-bold text-center mb-2 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            Pass the Card
+            Buzzed Out
           </h1>
-          <p className="text-gray-600 text-center mb-8">
-            Real-time multiplayer party game
+          <p className="text-gray-600 text-center mb-2 font-medium">
+            Buzzed out online game – free multiplayer
+          </p>
+          <p className="text-gray-500 text-center text-sm mb-8">
+            Play Buzzed Out online game with friends. Real-time multiplayer party game (Pass the Card).
           </p>
 
           {!connected && (
